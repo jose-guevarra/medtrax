@@ -25,7 +25,21 @@ def test_bedrock_knowledge_base_stack_synthesizes():
     template = assertions.Template.from_stack(stack)
 
     template.resource_count_is("AWS::Bedrock::KnowledgeBase", 1)
-    template.resource_count_is("AWS::Bedrock::DataSource", 1)
+    template.has_resource_properties(
+        "AWS::Bedrock::KnowledgeBase",
+        {
+            "Name": "multimodal-rag-s3vector-kb",
+            "KnowledgeBaseConfiguration": {
+                "Type": "VECTOR",
+                "VectorKnowledgeBaseConfiguration": {
+                    "EmbeddingModelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
+                },
+            },
+            "StorageConfiguration": {
+                "Type": "S3_VECTORS",
+            },
+        },
+    )
     template.has_resource_properties(
         "AWS::IAM::Role",
         {
@@ -43,23 +57,25 @@ def test_bedrock_knowledge_base_stack_synthesizes():
     template.has_resource_properties(
         "AWS::IAM::Policy",
         {
-            "PolicyDocument": {
-                "Statement": assertions.Match.array_with([
-                    assertions.Match.object_like(
-                        {
-                            "Action": assertions.Match.array_with([
-                                "s3vectors:WriteVectors",
-                                "s3vectors:ReadVectors",
-                                "s3vectors:GetVectors",
-                                "s3vectors:QueryVectors",
-                                "s3vectors:GetVectorIndex",
-                                "s3vectors:ListVectorIndexes",
-                            ]),
-                            "Effect": "Allow",
-                        }
-                    )
-                ])
-            }
+            "PolicyDocument": assertions.Match.object_like(
+                {
+                    "Statement": assertions.Match.array_with([
+                        assertions.Match.object_like(
+                            {
+                                "Action": assertions.Match.array_with([
+                                    "s3vectors:WriteVectors",
+                                    "s3vectors:ReadVectors",
+                                    "s3vectors:GetVectors",
+                                    "s3vectors:QueryVectors",
+                                    "s3vectors:GetVectorIndex",
+                                    "s3vectors:ListVectorIndexes",
+                                ]),
+                                "Effect": "Allow",
+                            }
+                        )
+                    ])
+                }
+            )
         },
     )
 

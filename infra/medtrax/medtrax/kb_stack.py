@@ -118,26 +118,4 @@ class MedTraxKbStack(Stack):
         )
         knowledge_base.node.add_dependency(kb_role)
 
-        # -------------------------------------------------------------
-        # 4. DATA SOURCE CONFIGURATION WITH MULTIMODAL SETTINGS
-        # -------------------------------------------------------------
-        bedrock.CfnDataSource(
-            self, "MultimodalS3DataSource",
-            knowledge_base_id=knowledge_base.ref,
-            name="s3-multimodal-docs-source",
-            data_source_configuration=bedrock.CfnDataSource.DataSourceConfigurationProperty(
-                type="S3",
-                s3_configuration=bedrock.CfnDataSource.S3DataSourceConfigurationProperty(
-                    bucket_arn=data_source_bucket.bucket_arn,
-                )
-            ),
-            vector_ingestion_configuration=bedrock.CfnDataSource.VectorIngestionConfigurationProperty(
-                parsing_configuration=bedrock.CfnDataSource.ParsingConfigurationProperty(
-                    parsing_strategy="BEDROCK_DATA_AUTOMATION",
-                    bedrock_data_automation_configuration=bedrock.CfnDataSource.BedrockDataAutomationConfigurationProperty(
-                        parsing_modality="MULTIMODAL"
-                    )
-                )
-            )
-        )
         
