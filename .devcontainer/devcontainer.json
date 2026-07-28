@@ -1,4 +1,5 @@
 {
+    "name": "MedTrax DevContainers",
     "build": {
         "dockerfile": "Dockerfile",
         "context": "..",

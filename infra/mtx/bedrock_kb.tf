@@ -122,6 +122,12 @@ resource "aws_s3_bucket" "multimodal_output_bucket" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket" "kb_data_source_bucket" {
+  bucket        = "medtrax-dev-source-bucket"
+  force_destroy = true
+}
+
+
 resource "aws_bedrockagent_knowledge_base" "knowledge_base" {
   name        = "medtrax-dev-knowledge-base"
   description = "Test knowledge base for Medtrax"
