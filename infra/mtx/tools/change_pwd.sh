@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+
+#aws cognito-idp initiate-auth \
+#  --auth-flow USER_PASSWORD_AUTH \
+#  --client-id 1t462qfips7tkb94g8sn8j0eub \
+#  --auth-parameters USERNAME=josedrg@gmail.com,PASSWORD='6mwRpc;P'
+
+aws cognito-idp respond-to-auth-challenge \
+  --region us-east-1 \
+  --client-id 1t462qfips7tkb94g8sn8j0eub \
+  --challenge-name NEW_PASSWORD_REQUIRED \
+  --session "AYABeGwZ4ntY9pSON6Pdb8IAVvMAHQABAAdTZXJ2aWNlABBDb2duaXRvVXNlclBvb2xzAAEAB2F3cy1rbXMAS2Fybjphd3M6a21zOnVzLWVhc3QtMTo3NDU2MjM0Njc1NTU6a2V5L2IxNTVhZmNhLWJmMjktNGVlZC1hZmQ4LWE5ZTA5MzY1M2RiZQC4AQIBAHgnFuRNRXNkpdS82RaDIJ87clYWGh03ZxVHIWF9KwyFfwEfouyLKaQsnTLf7lMvKwFjAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMalL1PeFR6IrrdZhhAgEQgDvFhoGoKYpsiYkpZ6SKni7ioXSvq3lmrmX2OlDUV80PzYK3iwxG_mdJdAVTEXZciBUh-rtTW6DaR_yXBQIAAAAADAAAEAAAAAAAAAAAAAAAAABjBXt80_MqjcRgWUGQtcgA_____wAAAAEAAAAAAAAAAAAAAAEAAADzK6G8hPxnigjWzz7exQI9ynS0Zoi3RRecycjg7wKm5ZDwS3aPLa30Z1fHNTTRtTLjIbnTXqiGUjgw9vpDrAsjv976Pu_Kf6d7I6O8Ym0dH2yLxCywIP3FyZteSIve9A_ytwB8akjEwPlmgQm7KH-gT-aMph5xc4QlJS_NJ2DMZrW31TCHc4sg4aV_rDOwPHFKEzet4nfeJYERozU1VuyRTLyZ2YbjIl8gkqxgrsO5_pAwsgkjp59gyB74L9gl8YNkIBEQ9VeFDGKCfQafRfWHf_qRXnc16-xfgXQruRiJGj42N-bzHfr72_alpAHMNTwUeH7c49PDZMt8NyUf3TJM3zFO8w" \
+  --challenge-responses \
+      USERNAME=josedrg@gmail.com,NEW_PASSWORD='Sm&uzoX$7twwWm'
