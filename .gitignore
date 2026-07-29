@@ -6,6 +6,7 @@ infra/mtx/tools/.env.change_pwd
 infra/mtx/tools/.env.test_agent
 
 src/agent/requirements.txt
+src/mtx_agent/requirements.txt
 
 node_modules
 cdk.out/

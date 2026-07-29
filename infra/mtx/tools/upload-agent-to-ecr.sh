@@ -21,12 +21,12 @@ echo "PROJECT_ROOT: ${PROJECT_ROOT}"
 cd "${PROJECT_ROOT}"
 
 # Check if we're in the right directory
-if [ ! -f "src/agent/Dockerfile" ]; then
+if [ ! -f "src/mtx_agent/Dockerfile" ]; then
     echo -e "${RED}❌ Could not find agent/Dockerfile in project root${NC}"
     exit 1
 fi
 
-AGENT_DIRECTORY="${PROJECT_ROOT}/src/agent"
+AGENT_DIRECTORY="${PROJECT_ROOT}/src/mtx_agent"
 
 echo -e "${YELLOW}Starting deployment...${NC}"
 echo ""
