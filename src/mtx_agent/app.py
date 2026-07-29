@@ -36,6 +36,9 @@ def __process_stream_chunk(message_chunk):
 
 @app.entrypoint
 def invoke_agent(payload):
+    app.logger.info("Starting agent.")
+    app.logger.info(payload)
+
     user_input = payload.get("prompt", "")
     conversation_history = payload.get("conversation_history", [])
 
