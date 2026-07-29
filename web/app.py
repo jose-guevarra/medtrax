@@ -1,0 +1,24 @@
+import streamlit as st
+
+from core.auth import is_authenticated, logout
+from core.config import load_config
+
+st.set_page_config(page_title="Medtrax", page_icon="🩺", layout="wide")
+
+config = load_config()
+
+if not is_authenticated(config):
+    pg = st.navigation([st.Page("views/login.py", title="Login", icon="🔑")])
+else:
+    pages = [
+        st.Page("views/chat.py", title="Home", icon="💬", default=True),
+        st.Page("views/upload.py", title="Upload Document", icon="📤"),
+    ]
+    pg = st.navigation(pages)
+    with st.sidebar:
+        st.caption(f"Logged in as **{st.session_state.auth['username']}**")
+        if st.button("Log out"):
+            logout()
+            st.rerun()
+
+pg.run()
