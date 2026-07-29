@@ -2,6 +2,9 @@
 
 
 infra/mtx/tools/.env.agent
+infra/mtx/tools/.env.change_pwd
+infra/mtx/tools/.env.test_agent
+
 src/agent/requirements.txt
 
 node_modules

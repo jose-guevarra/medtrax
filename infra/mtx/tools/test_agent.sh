@@ -1,18 +1,6 @@
 #!/bin/bash
 
-
-: '
-
-'
-
-ACCOUNT_ID=""
-AGENTCORE_RUNTIME_ID="rtid-DKKDD"
-
-TOKEN=""
-
-SESSION_ID=""
-
-PROMPT="In one sentence tell me about the method of the placebo effect experiment"
+source ./.env.test_agent
 
 
 curl -X POST \
@@ -20,5 +8,5 @@ curl -X POST \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -H "X-Amzn-Bedrock-AgentCore-Runtime-Session-Id: ${SESSION_ID}" \
-  -d '{"prompt": ${PROMPT}, "conversation_history": []}'
+  -d '{"prompt": "In one sentence tell me about the method of the placebo effect experiment", "conversation_history": []}'
 

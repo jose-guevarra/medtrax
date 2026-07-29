@@ -11,6 +11,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy all agent source files
 COPY *.py .
+ADD model ./model
+
 
 # Expose the port that BedrockAgentCoreApp runs on
 EXPOSE 8080
