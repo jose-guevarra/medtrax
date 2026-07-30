@@ -15,6 +15,7 @@ class Config:
     s3_data_source_bucket: str
     bedrock_knowledge_base_id: str
     bedrock_data_source_id: str
+    feedback_log_path: str
     debug: bool
 
 
@@ -37,5 +38,6 @@ def load_config() -> Config:
         s3_data_source_bucket=require("S3_DATA_SOURCE_BUCKET"),
         bedrock_knowledge_base_id=require("BEDROCK_KNOWLEDGE_BASE_ID"),
         bedrock_data_source_id=require("BEDROCK_DATA_SOURCE_ID"),
+        feedback_log_path=os.environ.get("FEEDBACK_LOG_PATH", "data/feedback.jsonl"),
         debug=os.environ.get("DEBUG", "").strip().lower() in ("true", "1"),
     )
