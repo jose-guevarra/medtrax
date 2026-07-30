@@ -1,7 +1,5 @@
 import json
-import time
 import urllib.parse
-import uuid
 from typing import Iterator
 
 import requests
@@ -12,10 +10,6 @@ from core.config import Config
 def build_invoke_url(runtime_arn: str, region: str) -> str:
     encoded_arn = urllib.parse.quote(runtime_arn, safe="")
     return f"https://bedrock-agentcore.{region}.amazonaws.com/runtimes/{encoded_arn}/invocations?qualifier=DEFAULT"
-
-
-def new_session_id() -> str:
-    return f"medtrax-web-{uuid.uuid4().hex}-{int(time.time())}"
 
 
 def invoke_agent_stream(

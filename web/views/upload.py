@@ -1,6 +1,7 @@
 import streamlit as st
 from botocore.exceptions import ClientError
 
+from core.auth import get_user_id
 from core.config import load_config
 from core.s3_upload import start_ingestion_job, upload_document
 
@@ -11,7 +12,8 @@ file = st.file_uploader("Choose a PDF", type=["pdf"])
 if file and st.button("Upload and sync"):
     with st.spinner("Uploading to S3…"):
         try:
-            key = upload_document(config, file.getvalue(), file.name, file.type)
+            user_id = get_user_id(config)
+            key = upload_document(config, user_id, file.getvalue(), file.name, file.type)
             st.success(f"Uploaded: s3://{config.s3_data_source_bucket}/{key}")
         except Exception as exc:
             st.error(f"Upload failed: {exc}")

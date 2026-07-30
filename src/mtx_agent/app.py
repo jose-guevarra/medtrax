@@ -1,3 +1,6 @@
+import base64
+import json
+
 from bedrock_agentcore import BedrockAgentCoreApp
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage
@@ -34,13 +37,36 @@ def __process_stream_chunk(message_chunk):
     yield {"type": "text", "text": text}
 
 
+def __decode_jwt_claims(token: str) -> dict:
+    payload = token.split(".")[1]
+    padded = payload + "=" * (-len(payload) % 4)
+    return json.loads(base64.urlsafe_b64decode(padded))
+
+
+def __extract_user_id(context) -> str | None:
+    # Unverified decode is safe here: AgentCore's custom_jwt_authorizer already
+    # validates this bearer token's signature before this entrypoint runs.
+    headers = (context.request_headers or {}) if context else {}
+    auth_header = headers.get("Authorization", "")
+    token = auth_header.removeprefix("Bearer ").strip()
+    if not token:
+        app.logger.warning("No Authorization header present; user_id will be unset")
+        return None
+    try:
+        return __decode_jwt_claims(token).get("sub")
+    except Exception:
+        app.logger.warning("Failed to decode bearer token claims")
+        return None
+
+
 @app.entrypoint
-def invoke_agent(payload):
+def invoke_agent(payload, context):
     app.logger.info("Starting agent.")
     app.logger.info(payload)
 
     user_input = payload.get("prompt", "")
     conversation_history = payload.get("conversation_history", [])
+    user_id = __extract_user_id(context)
 
     if not user_input:
         yield {
@@ -55,6 +81,7 @@ def invoke_agent(payload):
         initial_state = {
             "messages": messages,
             "generated_agent_queries": [],
+            "user_id": user_id,
         }
     except Exception as exc:
         app.logger.error("Error creating initial state for agent graph")

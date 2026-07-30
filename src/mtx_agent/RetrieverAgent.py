@@ -16,6 +16,7 @@ class AgentState(TypedDict):
     """Custom state for the agent"""
 
     messages: Annotated[List[Any], add_messages]
+    user_id: str | None
 
 
 class RetrieverAgent:

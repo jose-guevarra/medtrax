@@ -21,4 +21,9 @@ else:
             logout()
             st.rerun()
 
+        if config.debug:
+            st.divider()
+            st.caption("Debug")
+            st.code(st.session_state.auth["user_id"])
+
 pg.run()

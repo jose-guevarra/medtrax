@@ -1,3 +1,5 @@
+import base64
+import json
 import time
 
 import boto3
@@ -11,12 +13,25 @@ def _cognito_client(config: Config):
     return boto3.client("cognito-idp", region_name=config.aws_region)
 
 
+def _decode_id_token_claims(id_token: str) -> dict:
+    """Unverified decode of the ID token payload.
+
+    Safe here because the token comes straight from our own trusted
+    cognito-idp call, not from an untrusted caller.
+    """
+    payload = id_token.split(".")[1]
+    padded = payload + "=" * (-len(payload) % 4)
+    return json.loads(base64.urlsafe_b64decode(padded))
+
+
 def _extract_tokens(auth_result: dict) -> dict:
+    id_token = auth_result["IdToken"]
     return {
         "access_token": auth_result["AccessToken"],
-        "id_token": auth_result["IdToken"],
+        "id_token": id_token,
         "refresh_token": auth_result.get("RefreshToken"),
         "expires_at": time.time() + auth_result["ExpiresIn"],
+        "user_id": _decode_id_token_claims(id_token)["sub"],
     }
 
 
@@ -77,6 +92,10 @@ def is_authenticated(config: Config) -> bool:
 
 def get_access_token(config: Config) -> str | None:
     return st.session_state.auth["access_token"] if is_authenticated(config) else None
+
+
+def get_user_id(config: Config) -> str | None:
+    return st.session_state.auth["user_id"] if is_authenticated(config) else None
 
 
 def logout():

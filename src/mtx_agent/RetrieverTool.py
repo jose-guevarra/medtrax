@@ -1,9 +1,11 @@
 import os
+from typing import Annotated
 
 from dotenv import load_dotenv
 from langchain.tools import tool
 from langchain_aws import AmazonKnowledgeBasesRetriever
 from langchain_core.documents import Document
+from langgraph.prebuilt import InjectedState
 
 load_dotenv()
 
@@ -24,12 +26,19 @@ def extract_document_content(document: Document) -> Document:
 
 
 @tool
-def knowledge_base_retriever(query: str) -> str:
+def knowledge_base_retriever(query: str, state: Annotated[dict, InjectedState]) -> str:
     """Search and retrieve information from the knowledge base."""
+
+    retrieval_config = {"vectorSearchConfiguration": {"numberOfResults": 5}}
+    user_id = state.get("user_id")
+    if user_id:
+        retrieval_config["vectorSearchConfiguration"]["filter"] = {
+            "equals": {"key": "user_id", "value": user_id}
+        }
 
     retriever = AmazonKnowledgeBasesRetriever(
         knowledge_base_id=bedrock_knowledge_base_id,
-        retrieval_config={"vectorSearchConfiguration": {"numberOfResults": 5}},
+        retrieval_config=retrieval_config,
     )
     documents = retriever.invoke(query)
 

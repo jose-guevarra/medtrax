@@ -2,6 +2,20 @@
 Personal Health Records app
 
 
+- Create RAG app or agent or both
+- create front end
+- find a data set (my health records)
+- Ingest records
+- evaluate performance (mention criteria)
+- collect user feedback and monitor app
+- add app preview in video form
+- 
+
+
+
+https://github.com/jose-guevarra/llm-zoomcamp/blob/main/project.md
+
+
 # Bootstrap
 
 pip3 install uv

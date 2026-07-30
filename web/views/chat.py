@@ -1,13 +1,13 @@
 import streamlit as st
 
-from core.agent_client import invoke_agent_stream, new_session_id
-from core.auth import get_access_token
+from core.agent_client import invoke_agent_stream
+from core.auth import get_access_token, get_user_id
 from core.config import load_config
 
 config = load_config()
 st.title("Ask about your health records")
 
-st.session_state.setdefault("runtime_session_id", new_session_id())
+st.session_state.setdefault("runtime_session_id", get_user_id(config))
 st.session_state.setdefault("chat_history", [])
 
 for msg in st.session_state.chat_history:
