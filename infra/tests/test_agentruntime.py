@@ -5,7 +5,7 @@ client = boto3.client('bedrock-agentcore', region_name='us-east-1')
 payload = json.dumps({"prompt": "What can you do?"})
 payload = json.dumps({"prompt": "please add 23 plus 44444"})
 
-AGENT_RUNTIME_ARN="arn:aws:bedrock-agentcore:us-east-1:087045461309:runtime/MedTraxAgent-y9BUuLB1ZH"
+AGENT_RUNTIME_ARN="arn:aws:bedrock-agentcore:us-east-1::runtime/MedTraxAgent-"
 
 SESSION_ID=""
 
