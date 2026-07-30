@@ -34,13 +34,72 @@ def upload_document(config: Config, user_id: str, file_bytes: bytes, filename: s
     s3 = _session(config).client("s3", region_name=config.aws_region)
     extra = {"ContentType": content_type} if content_type else {}
     s3.put_object(Bucket=config.s3_data_source_bucket, Key=key, Body=file_bytes, **extra)
+    return key
+
+
+def build_embedding_key(user_id: str, filename: str) -> str:
+    stem = filename[:-4] if filename.lower().endswith(".pdf") else filename
+    return f"embeddings/{user_id}/{stem}.md"
+
+
+def upload_embedding_markdown(config: Config, user_id: str, filename: str, extracted: dict) -> str:
+    key = build_embedding_key(user_id, filename)
+    s3 = _session(config).client("s3", region_name=config.aws_region)
+    metadata_fields = {k: v for k, v in extracted.items() if k != "full_text"}
+    s3.put_object(
+        Bucket=config.s3_data_source_bucket,
+        Key=key,
+        Body=extracted["full_text"].encode("utf-8"),
+        ContentType="text/markdown",
+    )
     s3.put_object(
         Bucket=config.s3_data_source_bucket,
         Key=f"{key}.metadata.json",
-        Body=json.dumps({"metadataAttributes": {"user_id": user_id}}).encode("utf-8"),
+        Body=json.dumps({"metadataAttributes": {"user_id": user_id, **metadata_fields}}).encode("utf-8"),
         ContentType="application/json",
     )
     return key
+
+
+def delete_document(config: Config, user_id: str, filename: str) -> None:
+    s3 = _session(config).client("s3", region_name=config.aws_region)
+    original_key = build_object_key(user_id, filename)
+    embedding_key = build_embedding_key(user_id, filename)
+    keys = [
+        original_key,
+        f"{original_key}.metadata.json",  # legacy sidecar, from before extraction was split into embeddings/
+        embedding_key,
+        f"{embedding_key}.metadata.json",
+    ]
+    resp = s3.delete_objects(
+        Bucket=config.s3_data_source_bucket,
+        Delete={"Objects": [{"Key": key} for key in keys]},
+    )
+    errors = resp.get("Errors", [])
+    if errors:
+        details = "; ".join(f"{e['Key']}: {e['Code']} - {e['Message']}" for e in errors)
+        raise RuntimeError(f"Failed to delete some objects: {details}")
+
+
+def list_user_documents(config: Config, user_id: str) -> list[dict]:
+    s3 = _session(config).client("s3", region_name=config.aws_region)
+    prefix = f"uploads/{user_id}/"
+    paginator = s3.get_paginator("list_objects_v2")
+    documents = []
+    for page in paginator.paginate(Bucket=config.s3_data_source_bucket, Prefix=prefix):
+        for obj in page.get("Contents", []):
+            key = obj["Key"]
+            if key.endswith(".metadata.json"):
+                continue
+            documents.append(
+                {
+                    "name": key[len(prefix) :],
+                    "size_bytes": obj["Size"],
+                    "uploaded_at": obj["LastModified"],
+                }
+            )
+    documents.sort(key=lambda d: d["uploaded_at"], reverse=True)
+    return documents
 
 
 def start_ingestion_job(config: Config) -> str:

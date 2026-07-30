@@ -13,6 +13,7 @@ else:
     pages = [
         st.Page("views/chat.py", title="Home", icon="💬", default=True),
         st.Page("views/upload.py", title="Upload Document", icon="📤"),
+        st.Page("views/documents.py", title="My Documents", icon="🗂️"),
     ]
     pg = st.navigation(pages)
     with st.sidebar:

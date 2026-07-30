@@ -168,7 +168,8 @@ resource "awscc_bedrock_data_source" "s3_data_source" {
   description       = "Data source for the Amazon Bedrock Knowledge Base: medtrax-dev-knowledge-base from S3 with semantic chunking"
   data_source_configuration = {
     s3_configuration = {
-      bucket_arn = var.data_source_bucket_arn
+      bucket_arn         = var.data_source_bucket_arn
+      inclusion_prefixes = ["embeddings/"]
     }
     type = "S3"
   }

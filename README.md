@@ -58,3 +58,7 @@ sh upload-agent-to-ecr.sh
 terraform apply
 
 When successfuly, take note of Output values of deployed resource.
+
+
+# Web app
+uv run streamlit run app.py
