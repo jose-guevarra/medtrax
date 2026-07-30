@@ -26,17 +26,34 @@ else:
     }[sort_option]
     documents.sort(key=sort_key, reverse=reverse)
 
-    header = st.columns([4, 2, 3, 2])
+    COL_WIDTHS = [3, 2, 3, 2, 3, 2, 1]
+
+    def _text(value: str) -> str:
+        return value if value else "—"
+
+    def _provider(doc: dict) -> str:
+        name, kind = doc["provider_name"], doc["provider_type"]
+        if name and kind:
+            return f"{name} ({kind})"
+        return _text(name or kind)
+
+    header = st.columns(COL_WIDTHS)
     header[0].markdown("**Name**")
-    header[1].markdown("**Size**")
-    header[2].markdown("**Uploaded**")
+    header[1].markdown("**Type**")
+    header[2].markdown("**Provider**")
+    header[3].markdown("**Visit Date**")
+    header[4].markdown("**Amount Paid**")
+    header[5].markdown("**Uploaded**")
 
     for doc in documents:
-        row = st.columns([4, 2, 3, 2])
+        row = st.columns(COL_WIDTHS)
         row[0].write(doc["name"])
-        row[1].write(f"{doc['size_bytes'] / 1024:.1f} KB")
-        row[2].write(doc["uploaded_at"].strftime("%Y-%m-%d %H:%M:%S"))
-        if row[3].button("Delete", key=f"delete-{doc['name']}"):
+        row[1].write(_text(doc["document_type"]))
+        row[2].write(_provider(doc))
+        row[3].write(_text(doc["visit_date"]))
+        row[4].write(_text(doc["amount_paid"]))
+        row[5].write(doc["uploaded_at"].strftime("%Y-%m-%d %H:%M:%S"))
+        if row[6].button("", icon=":material/delete:", key=f"delete-{doc['name']}", help="Delete"):
             st.session_state.pending_delete = doc["name"]
 
     pending = st.session_state.get("pending_delete")

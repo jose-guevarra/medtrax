@@ -89,6 +89,16 @@ def upload_embedding_markdown(config: Config, user_id: str, filename: str, extra
     return key
 
 
+def _read_metadata_sidecar(s3, bucket: str, embedding_key: str) -> dict:
+    try:
+        obj = s3.get_object(Bucket=bucket, Key=f"{embedding_key}.metadata.json")
+    except ClientError as exc:
+        if exc.response.get("Error", {}).get("Code") in ("404", "NoSuchKey"):
+            return {}
+        raise
+    return json.loads(obj["Body"].read()).get("metadataAttributes", {})
+
+
 def delete_document(config: Config, user_id: str, filename: str) -> None:
     s3 = _session(config).client("s3", region_name=config.aws_region)
     original_key = build_object_key(user_id, filename)
@@ -119,11 +129,21 @@ def list_user_documents(config: Config, user_id: str) -> list[dict]:
             key = obj["Key"]
             if key.endswith(".metadata.json"):
                 continue
+            name = key[len(prefix) :]
+            sidecar = _read_metadata_sidecar(
+                s3, config.s3_data_source_bucket, build_embedding_key(user_id, name)
+            )
             documents.append(
                 {
-                    "name": key[len(prefix) :],
+                    "name": name,
                     "size_bytes": obj["Size"],
                     "uploaded_at": obj["LastModified"],
+                    "document_type": sidecar.get("document_type", ""),
+                    "provider_name": sidecar.get("provider_name", ""),
+                    "provider_type": sidecar.get("provider_type", ""),
+                    "payer": sidecar.get("payer", ""),
+                    "amount_paid": sidecar.get("amount_paid", ""),
+                    "visit_date": sidecar.get("visit_date") or sidecar.get("document_date", ""),
                 }
             )
     documents.sort(key=lambda d: d["uploaded_at"], reverse=True)
