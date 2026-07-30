@@ -56,10 +56,24 @@ def build_embedding_key(user_id: str, filename: str) -> str:
     return f"embeddings/{user_id}/{stem}.md"
 
 
+_MAX_METADATA_VALUE_LENGTH = 500
+
+
+def _sanitize_metadata_value(value) -> str:
+    text = "" if value is None else str(value)
+    return text[:_MAX_METADATA_VALUE_LENGTH]
+
+
 def upload_embedding_markdown(config: Config, user_id: str, filename: str, extracted: dict) -> str:
     key = build_embedding_key(user_id, filename)
     s3 = _session(config).client("s3", region_name=config.aws_region)
-    metadata_fields = {k: v for k, v in extracted.items() if k != "full_text"}
+    metadata_fields = {}
+    for k, v in extracted.items():
+        if k == "full_text":
+            continue
+        sanitized = _sanitize_metadata_value(v)
+        if sanitized:  # omit empty values entirely - Bedrock KB rejects "" as an invalid metadata value
+            metadata_fields[k] = sanitized
     s3.put_object(
         Bucket=config.s3_data_source_bucket,
         Key=key,
