@@ -14,6 +14,18 @@ documents = list_user_documents(config, user_id)
 if not documents:
     st.info("You haven't uploaded any documents yet.")
 else:
+    sort_option = st.selectbox(
+        "Sort by",
+        ["Newest first", "Oldest first", "Name (A-Z)", "Name (Z-A)"],
+    )
+    sort_key, reverse = {
+        "Newest first": (lambda d: d["uploaded_at"], True),
+        "Oldest first": (lambda d: d["uploaded_at"], False),
+        "Name (A-Z)": (lambda d: d["name"].lower(), False),
+        "Name (Z-A)": (lambda d: d["name"].lower(), True),
+    }[sort_option]
+    documents.sort(key=sort_key, reverse=reverse)
+
     header = st.columns([4, 2, 3, 2])
     header[0].markdown("**Name**")
     header[1].markdown("**Size**")
