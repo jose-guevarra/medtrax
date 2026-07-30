@@ -27,7 +27,7 @@ def extract_document_content(document: Document) -> Document:
 
 @tool
 def knowledge_base_retriever(query: str, state: Annotated[dict, InjectedState]) -> str:
-    """Search and retrieve information from the knowledge base."""
+    """Search and retrieve information from the user's medical records (medical reports and bills)."""
 
     retrieval_config = {"vectorSearchConfiguration": {"numberOfResults": 5}}
     user_id = state.get("user_id")
@@ -43,3 +43,9 @@ def knowledge_base_retriever(query: str, state: Annotated[dict, InjectedState]) 
     documents = retriever.invoke(query)
 
     return [extract_document_content(document) for document in documents]
+
+
+@tool
+def sum_integers(a: int, b: int) -> int:
+    """Add two integers together and return the sum."""
+    return a + b

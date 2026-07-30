@@ -9,7 +9,7 @@ from prompts import (
     generate_answer_system_message,
     generate_query_system_message,
 )
-from RetrieverTool import knowledge_base_retriever
+from RetrieverTool import knowledge_base_retriever, sum_integers
 
 
 class AgentState(TypedDict):
@@ -30,7 +30,7 @@ class RetrieverAgent:
         messages_with_system_message = [system_message] + state["messages"]
         response = (
             bedrock_llm_model(temperature=1.0)
-            .bind_tools([knowledge_base_retriever])
+            .bind_tools([knowledge_base_retriever, sum_integers])
             .invoke(messages_with_system_message)
         )
         if not response.tool_calls:
@@ -44,11 +44,8 @@ class RetrieverAgent:
         messages = state["messages"]
         contexts = []
         for message in reversed(messages):
-            if (
-                isinstance(message, ToolMessage)
-                and message.name == "knowledge_base_retriever"
-            ):
-                contexts.append(message.content)
+            if isinstance(message, ToolMessage):
+                contexts.append(str(message.content))
 
         merged_context = "\n\n".join([c for c in contexts if c])
 
@@ -70,7 +67,7 @@ class RetrieverAgent:
         workflow = StateGraph(AgentState)
 
         workflow.add_node("generate_query", self.__generate_query)
-        workflow.add_node("retrieve", ToolNode([knowledge_base_retriever]))
+        workflow.add_node("retrieve", ToolNode([knowledge_base_retriever, sum_integers]))
         workflow.add_node("generate_answer", self.__generate_answer)
 
         workflow.add_edge(START, "generate_query")

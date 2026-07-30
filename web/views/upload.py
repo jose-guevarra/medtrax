@@ -16,7 +16,7 @@ if file and st.button("Upload and sync"):
     with st.spinner("Uploading original to S3…"):
         try:
             key = upload_document(config, user_id, file.getvalue(), file.name, file.type)
-            st.success(f"Uploaded original: s3://{config.s3_data_source_bucket}/{key}")
+            st.success(f"Uploaded original...")
         except Exception as exc:
             st.error(f"Upload failed: {exc}")
             st.stop()
@@ -25,7 +25,7 @@ if file and st.button("Upload and sync"):
         try:
             extracted = extract_document_fields(config, file.getvalue(), file.name)
             embedding_key = upload_embedding_markdown(config, user_id, file.name, extracted)
-            st.success(f"Prepared for search: s3://{config.s3_data_source_bucket}/{embedding_key}")
+            st.success(f"Prepared for search...")
         except Exception as exc:
             st.error(f"Document processing failed: {exc}")
             st.stop()
@@ -33,7 +33,7 @@ if file and st.button("Upload and sync"):
     with st.spinner("Starting knowledge base ingestion sync…"):
         try:
             job_id = start_ingestion_job(config)
-            st.success(f"Ingestion job started: {job_id}")
+            st.success(f"Ingestion job started...")
             st.info(
                 "Ingestion runs in the background; ask about the document in Home "
                 "once it finishes (usually a few minutes)."

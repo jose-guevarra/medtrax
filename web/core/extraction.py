@@ -43,7 +43,7 @@ def build_extraction_schema() -> dict:
 
 def extraction_system_message() -> str:
     return (
-        "You are an expert at reading medical receipts and billing documents. "
+        "You are an expert at reading medical reports and billing documents. "
         "Extract the amount paid, payer, provider, provider type, document type, provider office name, office address, "
         "document date, and visit date when visible. If something is not visible, return an empty string. "
         "Also extract all visible text from the document. "
@@ -69,7 +69,7 @@ def extract_document_fields(config: Config, file_bytes: bytes, filename: str) ->
                 {
                     "toolSpec": {
                         "name": _TOOL_NAME,
-                        "description": "Structured extraction of key fields from a medical receipt or billing document.",
+                        "description": "Structured extraction of key fields from a medical report or billing document.",
                         "inputSchema": {"json": build_extraction_schema()},
                     }
                 }
