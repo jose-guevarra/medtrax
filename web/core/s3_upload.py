@@ -1,6 +1,7 @@
 import json
 
 import boto3
+from botocore.exceptions import ClientError
 
 from core.config import Config
 
@@ -28,8 +29,21 @@ def build_object_key(user_id: str, filename: str) -> str:
     return f"uploads/{user_id}/{filename}"
 
 
+def document_exists(config: Config, user_id: str, filename: str) -> bool:
+    s3 = _session(config).client("s3", region_name=config.aws_region)
+    try:
+        s3.head_object(Bucket=config.s3_data_source_bucket, Key=build_object_key(user_id, filename))
+        return True
+    except ClientError as exc:
+        if exc.response.get("Error", {}).get("Code") in ("404", "NoSuchKey"):
+            return False
+        raise
+
+
 def upload_document(config: Config, user_id: str, file_bytes: bytes, filename: str, content_type: str | None) -> str:
     validate_filename(filename)
+    if document_exists(config, user_id, filename):
+        raise ValueError(f"A document named '{filename}' already exists. Delete it first or rename the file before uploading.")
     key = build_object_key(user_id, filename)
     s3 = _session(config).client("s3", region_name=config.aws_region)
     extra = {"ContentType": content_type} if content_type else {}
