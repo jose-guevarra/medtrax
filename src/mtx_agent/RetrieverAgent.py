@@ -17,6 +17,7 @@ class AgentState(TypedDict):
 
     messages: Annotated[List[Any], add_messages]
     user_id: str | None
+    retrieved_sources: List[dict]
 
 
 class RetrieverAgent:
@@ -43,9 +44,12 @@ class RetrieverAgent:
     def __generate_answer(self, state: AgentState):
         messages = state["messages"]
         contexts = []
+        retrieved_sources = []
         for message in reversed(messages):
             if isinstance(message, ToolMessage):
                 contexts.append(str(message.content))
+                if isinstance(message.artifact, list):
+                    retrieved_sources.extend(message.artifact)
 
         merged_context = "\n\n".join([c for c in contexts if c])
 
@@ -61,7 +65,7 @@ class RetrieverAgent:
                 conversation_messages.append(message)
 
         response = bedrock_llm_model(temperature=0.1).invoke(conversation_messages)
-        return {"messages": [response]}
+        return {"messages": [response], "retrieved_sources": retrieved_sources}
 
     def get_agent_graph(self):
         workflow = StateGraph(AgentState)

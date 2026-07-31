@@ -6,6 +6,7 @@ from core.agent_client import invoke_agent_stream
 from core.auth import get_access_token, get_user_id
 from core.config import load_config
 from core.feedback import RATING_LABELS, record_feedback
+from core.retrieval_log import record_retrieval
 
 config = load_config()
 st.title("Ask about your health records")
@@ -78,6 +79,7 @@ if prompt:
     with st.chat_message("assistant"):
         placeholder = st.empty()
         full_text = ""
+        sources = []
         try:
             history = [
                 {"role": m["role"], "content": m["content"]}
@@ -89,6 +91,8 @@ if prompt:
                 if event.get("type") == "text":
                     full_text += event["text"]
                     placeholder.markdown(full_text + "▌")
+                elif event.get("type") == "sources":
+                    sources = event.get("sources", [])
                 elif event.get("type") == "error":
                     full_text += f"\n\n_Error: {event.get('text')}_"
                     break
@@ -97,11 +101,25 @@ if prompt:
             full_text = f"Request failed: {exc}"
             placeholder.markdown(full_text)
 
+        message_id = uuid.uuid4().hex
         new_message = {
-            "id": uuid.uuid4().hex,
+            "id": message_id,
             "role": "assistant",
             "content": full_text,
             "feedback": None,
         }
         st.session_state.chat_history.append(new_message)
         _render_assistant_feedback(new_message, prompt)
+
+        if sources:
+            try:
+                record_retrieval(
+                    config,
+                    user_id=user_id,
+                    session_id=st.session_state.runtime_session_id,
+                    message_id=message_id,
+                    question=prompt,
+                    sources=sources,
+                )
+            except Exception:
+                pass  # best-effort logging; never block the chat UI

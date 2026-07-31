@@ -25,24 +25,40 @@ def extract_document_content(document: Document) -> Document:
         )
 
 
-@tool
-def knowledge_base_retriever(query: str, state: Annotated[dict, InjectedState]) -> str:
-    """Search and retrieve information from the user's medical records (medical reports and bills)."""
-
+def build_retriever(user_id: str | None) -> AmazonKnowledgeBasesRetriever:
     retrieval_config = {"vectorSearchConfiguration": {"numberOfResults": 5}}
-    user_id = state.get("user_id")
     if user_id:
         retrieval_config["vectorSearchConfiguration"]["filter"] = {
             "equals": {"key": "user_id", "value": user_id}
         }
 
-    retriever = AmazonKnowledgeBasesRetriever(
+    return AmazonKnowledgeBasesRetriever(
         knowledge_base_id=bedrock_knowledge_base_id,
         retrieval_config=retrieval_config,
     )
+
+
+def extract_source(document: Document) -> dict:
+    metadata = document.metadata
+    return {
+        "s3_uri": metadata.get("location", {}).get("s3Location", {}).get("uri", ""),
+        "score": metadata.get("score", 0),
+        "document_type": metadata.get("source_metadata", {}).get("document_type", ""),
+    }
+
+
+@tool(response_format="content_and_artifact")
+def knowledge_base_retriever(
+    query: str, state: Annotated[dict, InjectedState]
+) -> tuple[list[Document], list[dict]]:
+    """Search and retrieve information from the user's medical records (medical reports and bills)."""
+
+    retriever = build_retriever(state.get("user_id"))
     documents = retriever.invoke(query)
 
-    return [extract_document_content(document) for document in documents]
+    content = [extract_document_content(document) for document in documents]
+    sources = [extract_source(document) for document in documents]
+    return content, sources
 
 
 @tool

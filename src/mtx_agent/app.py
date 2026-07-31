@@ -93,12 +93,18 @@ def invoke_agent(payload, context):
         return
 
     try:
-        for chunk, metadata in agent.stream(
+        for mode, event in agent.stream(
             initial_state,
-            stream_mode="messages",
+            stream_mode=["messages", "updates"],
         ):
-            if metadata.get("langgraph_node") == "generate_answer":
-                yield from __process_stream_chunk(chunk)
+            if mode == "messages":
+                chunk, metadata = event
+                if metadata.get("langgraph_node") == "generate_answer":
+                    yield from __process_stream_chunk(chunk)
+            elif mode == "updates":
+                sources = event.get("generate_answer", {}).get("retrieved_sources")
+                if sources:
+                    yield {"type": "sources", "sources": sources}
     except Exception as exc:
         app.logger.error("Streaming agent response failed")
         yield {
