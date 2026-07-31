@@ -1,15 +1,28 @@
-import json
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
+from decimal import Decimal
+
+import boto3
 
 from core.config import Config
 
 
-def _log_path(config: Config) -> Path:
-    path = Path(config.retrieval_log_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return path
+def _session(config: Config) -> boto3.Session:
+    return boto3.Session(profile_name=config.aws_profile) if config.aws_profile else boto3.Session()
+
+
+def _table(config: Config):
+    return _session(config).resource("dynamodb", region_name=config.aws_region).Table(config.retrieval_table_name)
+
+
+def _to_dynamo_number(value):
+    if isinstance(value, float):
+        return Decimal(str(value))
+    if isinstance(value, dict):
+        return {k: _to_dynamo_number(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_to_dynamo_number(v) for v in value]
+    return value
 
 
 def record_retrieval(
@@ -27,8 +40,7 @@ def record_retrieval(
         "session_id": session_id,
         "user_id": user_id,
         "question": question,
-        "sources": sources,
+        "sources": _to_dynamo_number(sources),
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
-    with _log_path(config).open("a", encoding="utf-8") as f:
-        f.write(json.dumps(record) + "\n")
+    _table(config).put_item(Item=record)

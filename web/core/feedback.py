@@ -1,7 +1,7 @@
-import json
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
+
+import boto3
 
 from core.config import Config
 
@@ -10,10 +10,12 @@ RATING_LABELS = {0: "down", 1: "up"}
 _VALID_RATINGS = set(RATING_LABELS.values())
 
 
-def _log_path(config: Config) -> Path:
-    path = Path(config.feedback_log_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return path
+def _session(config: Config) -> boto3.Session:
+    return boto3.Session(profile_name=config.aws_profile) if config.aws_profile else boto3.Session()
+
+
+def _table(config: Config):
+    return _session(config).resource("dynamodb", region_name=config.aws_region).Table(config.feedback_table_name)
 
 
 def record_feedback(
@@ -38,5 +40,4 @@ def record_feedback(
         "response_text": response_text,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
-    with _log_path(config).open("a", encoding="utf-8") as f:
-        f.write(json.dumps(record) + "\n")
+    _table(config).put_item(Item=record)

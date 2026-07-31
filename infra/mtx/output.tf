@@ -17,3 +17,11 @@ output "knowledge_base_id" {
 output "bedrock_data_source_id" {
   value = awscc_bedrock_data_source.s3_data_source.data_source_id
 }
+
+output "feedback_table_name" {
+  value = aws_dynamodb_table.feedback.name
+}
+
+output "retrieval_table_name" {
+  value = aws_dynamodb_table.retrievals.name
+}
