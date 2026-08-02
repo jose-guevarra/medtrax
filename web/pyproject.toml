@@ -12,6 +12,8 @@ dependencies = [
     "boto3>=1.43.57",
     "requests>=2.32",
     "python-dotenv>=1.2.2",
+    "altair>=5",
+    "pandas>=2",
 ]
 
 [tool.uv]

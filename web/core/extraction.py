@@ -15,15 +15,41 @@ def build_extraction_schema() -> dict:
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "amount_paid": {"type": "string", "maxLength": 20},
+            "amount_paid": {
+                "type": "string",
+                "maxLength": 20,
+                "description": (
+                    "Dollar amount formatted as $X,XXX.XX (always a leading '$', "
+                    "thousands separators, exactly two decimal places). Empty string if not visible."
+                ),
+            },
             "payer": {"type": "string", "maxLength": 100},
             "provider_name": {"type": "string", "maxLength": 150},
             "provider_type": {"type": "string", "maxLength": 100},
-            "document_type": {"type": "string", "maxLength": 100},
+            "document_type": {
+                "type": "string",
+                "enum": [
+                    "Bill / Invoice",
+                    "Receipt / Payment Confirmation",
+                    "Insurance EOB",
+                    "Lab / Test Result",
+                    "Visit Summary / Clinical Note",
+                    "Prescription / Pharmacy",
+                    "Other",
+                ],
+            },
             "provider_office_name": {"type": "string", "maxLength": 150},
             "provider_office_address": {"type": "string", "maxLength": 300},
-            "document_date": {"type": "string", "maxLength": 20},
-            "visit_date": {"type": "string", "maxLength": 20},
+            "document_date": {
+                "type": "string",
+                "maxLength": 20,
+                "description": "Date formatted as ISO 8601 YYYY-MM-DD. Empty string if not visible.",
+            },
+            "visit_date": {
+                "type": "string",
+                "maxLength": 20,
+                "description": "Date formatted as ISO 8601 YYYY-MM-DD. Empty string if not visible.",
+            },
             "full_text": {"type": "string"},
         },
         "required": [
@@ -46,6 +72,11 @@ def extraction_system_message() -> str:
         "You are an expert at reading medical reports and billing documents. "
         "Extract the amount paid, payer, provider, provider type, document type, provider office name, office address, "
         "document date, and visit date when visible. If something is not visible, return an empty string. "
+        "Format amount_paid as $X,XXX.XX (leading '$', thousands separators, two decimal places). "
+        "Format document_date and visit_date as ISO 8601 (YYYY-MM-DD). "
+        "Classify document_type into exactly one of these categories: 'Bill / Invoice', "
+        "'Receipt / Payment Confirmation', 'Insurance EOB', 'Lab / Test Result', "
+        "'Visit Summary / Clinical Note', 'Prescription / Pharmacy', or 'Other' if none of the others fit. "
         "Also extract all visible text from the document. "
     )
 
