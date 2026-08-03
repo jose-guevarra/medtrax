@@ -9,6 +9,19 @@ questions and real filenames from documents you've actually uploaded (as
 shown on the Documents page) - ground truth can't be guessed, it has to
 reflect what's actually in your knowledge base.
 
+Environment variables:
+    BEDROCK_KNOWLEDGE_BASE_ID   Required. Read by RetrieverTool.py to build the
+                                retriever; retrieval fails if unset.
+    AWS_PROFILE                 Optional named AWS CLI/SSO profile. Omit to use
+                                the default credential chain.
+    AWS_REGION / AWS_DEFAULT_REGION
+                                Region the Knowledge Base lives in.
+
+No .env file is checked in under src/mtx_agent/ (unlike web/.env for the
+Streamlit app), and RetrieverTool.py's load_dotenv() only searches upward
+from its own location - so export these in your shell, or add a .env under
+src/mtx_agent/ or a parent directory, before running.
+
 Usage:
     python hit_rate.py --user-id <cognito-sub> [--test-set test_set.jsonl] [--k 5]
 """
@@ -35,6 +48,8 @@ def evaluate(test_set_path: Path, user_id: str, k: int) -> float:
     retriever = build_retriever(user_id)
     hits = 0
     total = 0
+    documents_seen = set()
+    missing_answer = 0
 
     with test_set_path.open(encoding="utf-8") as f:
         for line in f:
@@ -44,6 +59,9 @@ def evaluate(test_set_path: Path, user_id: str, k: int) -> float:
             row = json.loads(line)
             question = row["question"]
             expected = row["expected_document"]
+            documents_seen.add(_stem(expected))
+            if not row.get("answer"):
+                missing_answer += 1
 
             documents = retriever.invoke(question)[:k]
             retrieved_names = [_filename(extract_source(doc)["s3_uri"]) for doc in documents]
@@ -56,11 +74,18 @@ def evaluate(test_set_path: Path, user_id: str, k: int) -> float:
 
     hit_rate = hits / total if total else 0.0
     print(f"\nhit_rate = {hits}/{total} = {hit_rate:.2%}")
+    print(f"Questions: {total}  |  Documents: {len(documents_seen)}  |  Missing answer: {missing_answer}")
     return hit_rate
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Compute document-level hit_rate for the RAG retriever.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Compute document-level hit_rate for the RAG retriever. Requires "
+            "BEDROCK_KNOWLEDGE_BASE_ID and AWS credentials/region (e.g. AWS_PROFILE, "
+            "AWS_REGION) in the environment - see the module docstring for details."
+        )
+    )
     parser.add_argument("--user-id", required=True, help="Cognito user id (sub) whose documents to search")
     parser.add_argument(
         "--test-set",

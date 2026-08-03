@@ -56,6 +56,12 @@ def build_embedding_key(user_id: str, filename: str) -> str:
     return f"embeddings/{user_id}/{stem}.md"
 
 
+def read_document_text(config: Config, user_id: str, filename: str) -> str:
+    s3 = _session(config).client("s3", region_name=config.aws_region)
+    obj = s3.get_object(Bucket=config.s3_data_source_bucket, Key=build_embedding_key(user_id, filename))
+    return obj["Body"].read().decode("utf-8")
+
+
 _MAX_METADATA_VALUE_LENGTH = 500
 
 

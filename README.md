@@ -43,6 +43,9 @@ documents, so you always know exactly where the information came from.
 
 ## Architecture
 
+![Architecture](media/archsvg.svg)
+
+
 The web app is a multi-page Streamlit UI: log in via Cognito, upload health
 records, browse them in a sortable table (type, provider, visit date, amount
 paid — pulled out during ingestion), and chat with an assistant that answers
@@ -173,7 +176,7 @@ sh upload-agent-to-ecr.sh
 You should see a new Docker image in ECR in your AWS Account.
 
 
-### Step 3 - ReDploy
+### Step 3 - Re Deploy
 
 Now that the image is in ECR, AWS Bedrock AgentCore can use it as the Runtime for the Agent.  So 
 deploy using Terraform again.
@@ -195,5 +198,14 @@ uv run streamlit run app.py
 
 
 
+
+
 ## Acknowledgements
 
+- [DataTalksClub](https://datatalks.club) for the LLM Zoomcamp
+- We extend our sincere gratitude to Alexey Grigorev and the DataTalks Club team for their expert guidance, valuable Slack  support, and for creating this exceptional learning opportunity through the LLM course.
+
+
+## Author
+
+Developed as part of LLM Zoomcamp 2026 by Jose Guevarra. 

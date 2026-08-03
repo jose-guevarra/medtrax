@@ -26,7 +26,7 @@ else:
     }[sort_option]
     documents.sort(key=sort_key, reverse=reverse)
 
-    COL_WIDTHS = [3, 2, 3, 2, 3, 2, 1]
+    COL_WIDTHS = [3, 2, 3, 2, 3, 2, 1, 1]
 
     def _text(value: str) -> str:
         return value if value else "—"
@@ -53,7 +53,10 @@ else:
         row[3].write(_text(doc["visit_date"]))
         row[4].write(_text(doc["amount_paid"]))
         row[5].write(doc["uploaded_at"].strftime("%Y-%m-%d %H:%M:%S"))
-        if row[6].button("", icon=":material/delete:", key=f"delete-{doc['name']}", help="Delete"):
+        if row[6].button("", icon=":material/quiz:", key=f"eval-{doc['name']}", help="Ask about this document"):
+            st.session_state.qa_selected_document = doc["name"]
+            st.switch_page("views/document_qa.py")
+        if row[7].button("", icon=":material/delete:", key=f"delete-{doc['name']}", help="Delete"):
             st.session_state.pending_delete = doc["name"]
 
     pending = st.session_state.get("pending_delete")

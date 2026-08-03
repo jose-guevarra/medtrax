@@ -15,6 +15,7 @@ else:
         st.Page("views/upload.py", title="Upload Document", icon="📤"),
         st.Page("views/documents.py", title="My Documents", icon="🗂️"),
         st.Page("views/health_graph.py", title="Health Graph", icon="📈"),
+        st.Page("views/document_qa.py", title="Eval Builder", icon="🧪"),
     ]
     pg = st.navigation(pages)
     with st.sidebar:
