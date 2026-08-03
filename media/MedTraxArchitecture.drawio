@@ -120,11 +120,19 @@
             <mxPoint x="493" y="370" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="1rbG5q6BrjMZAXtDIYtN-1" connectable="0" parent="3k8Fn7JOCdm12XQlPgCY-10" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="OpenTelemetry" vertex="1">
+          <mxGeometry relative="1" x="-0.143" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="3k8Fn7JOCdm12XQlPgCY-12" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" target="s5cL7WHbZDjDtt19md1w-11" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <mxPoint x="358" y="640" as="sourcePoint" />
             <mxPoint x="440" y="640.5" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="1rbG5q6BrjMZAXtDIYtN-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Architecture" vertex="1">
+          <mxGeometry height="30" width="60" x="20" y="330" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

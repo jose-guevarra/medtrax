@@ -29,6 +29,8 @@ like "how much did I spend at Dr. Smith's office last year" or "what did my
 last blood test show" — and get answers pulled directly from your own
 documents, so you always know exactly where the information came from.
 
+WARNING: <u>This is a personal project. This project is not HIPAA compliant and should not be used in production.</u>
+
 ## Technology Stack
 
 - **Python 3.14**, managed with `uv`
@@ -71,7 +73,6 @@ stay scoped to the user who made the request.
 
 ```
 ├── bootstrap.sh
-├── directory_structure.txt
 ├── infra
 │   ├── mtx
 │   │   ├── agentcore_runtime.tf
@@ -147,24 +148,29 @@ stay scoped to the user who made the request.
 ```
 
 
-
 # Demo
 
 
-- User pages
+### Click here to watch the demo ▶️▶️
 
-- Metrics?
-
-
-- Screen Capture
-
-- 
+ ➡️▶️ [MedTrax Web App](https://youtu.be/UuF7GrneWJ0?si=X02M14yZnZmdi_jj)
 
 
+ ➡️▶️ [MedTrax AWS Backend](https://youtu.be/vFB5mV2FYG8?si=OR2MobEgTTGeOKOG)
 
 
+### ScreenShots
 
 
+![Homepage Chat](media/HomePage.png)
+
+![My Docs](media/MyDocs.png)
+
+![Document Chat + Eval Page](media/EvalPage.png)
+
+![File Upload](media/FileUpload.png)
+
+![AgentCore Runtime](media/AgentCoreRuntime.png)
 
 
 # Results
@@ -200,19 +206,17 @@ row in the file against the live retriever and reports the hit rate.
 the rest manually authored):
 
 ```
-hit_rate = 41/50 = 82.00%
-Questions: 50  |  Documents: 9  |  Missing answer: 43
+hit_rate = 46/56 = 82.14%
+Questions: 56  |  Documents: 10  |  Missing answer: 48
 ```
-
-
 
 
 ## Future Improvements
 
-- Migreate to Back For Front (BFF) architechture behind API GW
-- Add text search with Open Search
-- 
-
+- Migrate to Back For Front (BFF) architechture behind API GW for security
+- Add guard rails and rate limiting for costs optimization
+- Add longterm memory and shorterm memory 
+- Add text search with Open Search for more accurate searches
 
 
 ## Installation
@@ -220,8 +224,6 @@ Questions: 50  |  Documents: 9  |  Missing answer: 43
 NOTE: 
 Best way to deploy and run application is in VS Code DevContainers.
 In VS Code, install the DevContainers extension.   
-
-
 
 
 
@@ -233,8 +235,6 @@ In VS Code, install the DevContainers extension.
 - Terraform
 - AWS Account
 - AWS Cli
-
-
 
 
 
@@ -303,15 +303,25 @@ terraform apply
 When successfuly, take note of Output values of deployed resource.
 
 
+### Step 4 - Create a user in AWS Cognito
+
+Go to AWS Cognito -> Users -> Create User.
+
+Create a user and set their password.  You can then login as that user.
+
+
 # Web app
+
+Create `web/.env` from the template file: `web/.env.example`.
+Fill in all the values from output from Terraform apply and 
+by looking in the AWS Console for resource identifiers. 
+
+Now start the web app.
 
 ```
 cd web
 uv run streamlit run app.py
 ```
-
-
-
 
 
 
