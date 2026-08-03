@@ -290,7 +290,7 @@ terraform plan
 terraform apply
 ```
 
-NOTE: This will fail due to no ECR image!
+<u>NOTE: This will fail due to no ECR image</u>
 
 ### Step 2 - Build initial Docker image
 
@@ -341,6 +341,7 @@ cd web
 uv run streamlit run app.py
 ```
 
+Upload a file then go to the home page and ask questions about the doc.
 
 
 ## Acknowledgements
