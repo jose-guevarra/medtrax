@@ -6,10 +6,28 @@
 
 ## Table of Contents
 
-
-
-
-
+- [Problem Description](#problem-description)
+- [Solution](#solution)
+- [Technology Stack](#technology-stack)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Demo](#demo)
+  - [Click here to watch the demo ▶️▶️](#click-here-to-watch-the-demo-️️)
+  - [ScreenShots](#screenshots)
+- [Results](#results)
+  - [Data](#data)
+  - [Evaluation](#evaluation)
+- [Future Improvements](#future-improvements)
+- [Installation](#installation)
+  - [Requirements](#requirements)
+- [Deploy Instructions](#deploy-instructions)
+  - [Step 1](#step-1)
+  - [Step 2 - Build initial Docker image](#step-2---build-initial-docker-image)
+  - [Step 3 - Re Deploy](#step-3---re-deploy)
+  - [Step 4 - Create a user in AWS Cognito](#step-4---create-a-user-in-aws-cognito)
+- [Web app](#web-app)
+- [Acknowledgements](#acknowledgements)
+- [Author](#author)
 
 ## Problem Description
 
