@@ -219,8 +219,8 @@ retrieval holds up across different ways of asking the same thing, not just
 the original exact wording. `src/mtx_agent/eval/hit_rate.py` replays every
 row in the file against the live retriever and reports the hit rate.
 
-**Current results** (50 questions across the 9 documents uploaded so far —
-43 of them LLM-generated phrasings without a hand-verified reference answer,
+**Current results** (56 questions across the 10 documents uploaded so far —
+48 of them LLM-generated phrasings without a hand-verified reference answer,
 the rest manually authored):
 
 ```
@@ -290,7 +290,7 @@ terraform plan
 terraform apply
 ```
 
-<u>NOTE: This will fail due to no ECR image</u>
+<u>NOTE: This will fail the FIRST time due to no ECR image. (Continue to next step to fix.)</u>
 
 ### Step 2 - Build initial Docker image
 
