@@ -264,7 +264,7 @@ Python deps and Terraform.
 git clone https://github.com/jose-guevarra/medtrax.git
 cd metrax
 
-git checkout -b main 6ee073e
+git checkout -b main 6bbad0d
 
 ```
 
