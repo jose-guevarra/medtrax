@@ -69,6 +69,84 @@ stay scoped to the user who made the request.
 
 ## Project Structure
 
+```
+├── bootstrap.sh
+├── directory_structure.txt
+├── infra
+│   ├── mtx
+│   │   ├── agentcore_runtime.tf
+│   │   ├── bedrock_kb.tf
+│   │   ├── cognito.tf
+│   │   ├── data.tf
+│   │   ├── dynamodb.tf
+│   │   ├── example.tfvars
+│   │   ├── output.tf
+│   │   ├── providers.tf
+│   │   ├── terraform.tfstate
+│   │   ├── terraform.tfstate.backup
+│   │   ├── terraform.tfvars
+│   │   ├── tools
+│   │   │   ├── change_pwd.sh
+│   │   │   ├── env.agent.template
+│   │   │   ├── test_agent.sh
+│   │   │   └── upload-agent-to-ecr.sh
+│   │   └── variables.tf
+│   └── tests
+│       ├── main.py
+│       ├── pyproject.toml
+│       ├── README.md
+│       ├── test_agentruntime.py
+│       └── uv.lock
+├── media
+│   ├── archsvg.svg
+│   └── MedTraxArchitecture.drawio
+├── pyproject.toml
+├── README.md
+├── src
+│   ├── Makefile
+│   └── mtx_agent
+│       ├── app.py
+│       ├── Dockerfile
+│       ├── eval
+│       │   ├── hit_rate.py
+│       │   └── test_set.jsonl
+│       ├── llm_model.py
+│       ├── prompts.py
+│       ├── pyproject.toml
+│       ├── README.md
+│       ├── requirements.txt
+│       ├── RetrieverAgent.py
+│       └── RetrieverTool.py
+├── uv.lock
+└── web
+    ├── app.py
+    ├── core
+    │   ├── __init__.py
+    │   ├── agent_client.py
+    │   ├── auth.py
+    │   ├── config.py
+    │   ├── document_qa.py
+    │   ├── eval_gen.py
+    │   ├── eval_retrieval.py
+    │   ├── eval_store.py
+    │   ├── extraction.py
+    │   ├── feedback.py
+    │   ├── retrieval_log.py
+    │   └── s3_upload.py
+    ├── pyproject.toml
+    ├── README.md
+    ├── uv.lock
+    └── views
+        ├── chat.py
+        ├── document_qa.py
+        ├── documents.py
+        ├── health_graph.py
+        ├── login.py
+        └── upload.py
+
+```
+
+
 
 # Demo
 
@@ -87,16 +165,53 @@ stay scoped to the user who made the request.
 
 
 
-## Results
 
 
+# Results
+
+
+## Data
+
+I used personal medical reciepts and medical test results over several
+years.   
+
+
+## Evaluation
+
+Retrieval quality is measured with a document-level hit rate: for a set of
+`{question, expected_document}` pairs, does the correct source document show
+up among the top-k results the Bedrock Knowledge Base retriever returns for
+that question (matched by filename, since each document is ingested as one
+markdown blob with no page-level boundaries to check finer-grained precision
+against)? This checks whether retrieval found the right document to answer
+from — it doesn't score the chat agent's final answer text.
+
+Ground truth lives in `src/mtx_agent/eval/test_set.jsonl` and is built up two
+ways from the "Eval Builder" page: manually, by asking a single document
+questions directly and saving good question/answer pairs against it; and
+automatically, by asking an LLM to generate additional phrasings of a
+question that should still resolve to the same document, to test whether
+retrieval holds up across different ways of asking the same thing, not just
+the original exact wording. `src/mtx_agent/eval/hit_rate.py` replays every
+row in the file against the live retriever and reports the hit rate.
+
+**Current results** (50 questions across the 9 documents uploaded so far —
+43 of them LLM-generated phrasings without a hand-verified reference answer,
+the rest manually authored):
+
+```
+hit_rate = 41/50 = 82.00%
+Questions: 50  |  Documents: 9  |  Missing answer: 43
+```
 
 
 
 
 ## Future Improvements
 
-
+- Migreate to Back For Front (BFF) architechture behind API GW
+- Add text search with Open Search
+- 
 
 
 
