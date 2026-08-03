@@ -343,6 +343,11 @@ uv run streamlit run app.py
 
 Upload a file then go to the home page and ask questions about the doc.
 
+Here are some sample files:
+
+https://drive.proton.me/urls/JQCZ3ZQN2M#vHTnXdCCbgFr
+
+
 
 ## Acknowledgements
 
